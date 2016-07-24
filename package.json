@@ -1,0 +1,17 @@
+{
+  "name": "scene-streamer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape tests/**.js && semistandard"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "dom-lite": "scenevr/dom-lite",
+    "micro-dom": "scenevr/micro-dom",
+    "tape": "^4.6.0"
+  }
+}
