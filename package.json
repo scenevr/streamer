@@ -8,7 +8,9 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {},
+  "dependencies": {
+    "uuid": "^2.0.2"
+  },
   "devDependencies": {
     "dom-lite": "scenevr/dom-lite",
     "micro-dom": "scenevr/micro-dom",

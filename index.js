@@ -1,4 +1,4 @@
 module.exports = {
-  Observer: require('./observer'),
-  Reciever: require('./reciever');
+  Patch: require('./patch'),
+  Apply: require('./apply')
 };
