@@ -89,33 +89,36 @@ test('get full state', (t) => {
   t.end();
 });
 
-/*
-
 test('animate a cube', (t) => {
   var doc = createDocument();
   var interval;
 
   doc.documentElement.innerHTML = '<body><a-scene><a-cube></a-cube></a-scene></body>';
 
-  streamer(doc.documentElement, (message) => {
-    t.equal(message.mutations.length, 1);
-    t.equal(message.mutations[0].type, 'attribute');
-    t.equal(message.mutations[0].name, 'rotation');
-
-    clearInterval(interval);
-    t.end();
+  Patch(doc.documentElement, (message) => {
+    console.log(message);
+    // t.equal(message.mutations.length, 1);
+    // t.equal(message.mutations[0].type, 'attribute');
+    // t.equal(message.mutations[0].name, 'rotation');
+    // t.end();
   });
 
   var cube = doc.querySelector('a-cube');
   t.ok(cube);
 
   var e = {x: 0, y: 0, z: 0};
+  var p = {x: 0, y: 0, z: 0};
 
   interval = setInterval(() => {
     e.y += 1;
-    cube.setAttribute('rotation', e);
+    p.y = Math.sin(e.y) * 4;
+    cube.setAttribute('rotation', [e.x, e.y, e.z].join(' '));
+    cube.setAttribute('position', [p.x, p.y, p.z].join(' '));
   }, 5);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    t.end();
+  }, 25);
 });
 
-
-*/

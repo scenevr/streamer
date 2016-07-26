@@ -8,6 +8,10 @@ const UUID_KEY = 'data-uuid';
 function Patch (root, broadcast) {
   var document = root.ownerDocument;
 
+  function generateUUID () {
+    return uuid.v4();
+  }
+
   // todo - add uuid to textNodes
   function treeUUID (el, childNodes) {
     var nodes = [el];
@@ -18,7 +22,7 @@ function Patch (root, broadcast) {
 
     nodes.forEach((e) => {
       if (!pa.has(e, UUID_KEY)) {
-        pa.set(e, UUID_KEY, uuid.v4());
+        pa.set(e, UUID_KEY, generateUUID());
       }
     });
   }
@@ -43,15 +47,31 @@ function Patch (root, broadcast) {
     return cloneWithUUID(root).outerHTML;
   };
 
+  treeUUID(root, true);
+
   var observer = new MutationObserver(function (mutations) {
     var patch = document.createElement('patch');
 
-    mutations.forEach(function (mutation) {
-      treeUUID(mutation.target, false);
+    // Cache attribute mutations to merge them
+    var attributeMutations = {};
 
-      var el = document.createElement(mutation.target.nodeName);
-      el.setAttribute(UUID_KEY, pa.get(mutation.target, UUID_KEY));
-      patch.appendChild(el);
+    mutations.forEach(function (mutation) {
+      treeUUID(mutation.target, true);
+
+      var uuid = pa.get(mutation.target, UUID_KEY);
+      var el;
+
+      if (mutation.type === 'attributes' && attributeMutations[uuid]) {
+        el = attributeMutations[uuid];
+      } else {
+        el = document.createElement(mutation.target.nodeName);
+        el.setAttribute(UUID_KEY, uuid);
+        patch.appendChild(el);
+      }
+
+      if (mutation.type === 'attributes') {
+        attributeMutations[uuid] = el;
+      }
 
       switch (mutation.type) {
         case 'attributes':
