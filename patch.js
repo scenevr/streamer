@@ -1,9 +1,20 @@
 /* globals MutationObserver */
 
+/*
+
+  Todo:
+
+    * Character data support
+    * Merge multiple updates into one packet
+
+*/
+
 var pa = require('./private-attributes');
 var uuid = require('uuid');
 
 const UUID_KEY = 'data-uuid';
+const DEAD_NODE_NAME = 'dead';
+const PATCH_NODE_NAME = 'patch';
 
 function Patch (root, broadcast) {
   var document = root.ownerDocument;
@@ -50,7 +61,7 @@ function Patch (root, broadcast) {
   treeUUID(root, true);
 
   var observer = new MutationObserver(function (mutations) {
-    var patch = document.createElement('patch');
+    var patch = document.createElement(PATCH_NODE_NAME);
 
     // Cache attribute mutations to merge them
     var attributeMutations = {};
@@ -85,7 +96,7 @@ function Patch (root, broadcast) {
           });
 
           mutation.removedNodes.forEach((m) => {
-            var removed = document.createElement('dead');
+            var removed = document.createElement(DEAD_NODE_NAME);
             removed.setAttribute(UUID_KEY, pa.get(m, UUID_KEY));
             el.appendChild(removed);
           });
@@ -95,21 +106,12 @@ function Patch (root, broadcast) {
           console.error(`Unknown mutation type '${mutation.type}'.`);
           break;
       }
-
-      // packets.push(packet);
     });
 
     broadcast(patch.outerHTML);
-
-    // broadcast({
-    //   type: 'mutation',
-    //   mutations: packets
-    // });
   });
 
-  // configuration of the observer:
   var config = { attributes: true, subtree: true, childList: true, characterData: true };
-
   observer.observe(root, config);
 }
 
