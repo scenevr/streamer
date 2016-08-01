@@ -118,6 +118,7 @@ function Patch (root, broadcast) {
             removed.setAttribute(UUID_KEY, pa.get(m, UUID_KEY));
             el.appendChild(removed);
           });
+        
           break;
 
         default:

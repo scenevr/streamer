@@ -9,23 +9,46 @@ const SNAPSHOT_NODE_NAME = 'snapshot';
 function Apply (root) {
   var document = root.ownerDocument;
 
+  function copyChildren (source, destination) {
+    Array.from(source.childNodes).forEach((n) => {
+      var clone;
+
+      if (n.nodeType === 1) {
+        clone = document.createElement(n.nodeName);
+        copyChildren(n, clone);
+
+        // Apply attributes
+        for (var i = 0; i < n.attributes.length; i++) {
+          var attribute = n.attributes[i];
+
+          if (attribute.name === UUID_KEY) {
+            pa.set(clone, UUID_KEY, attribute.value);
+          } else {
+            clone.setAttribute(attribute.name, attribute.value);
+          }
+        }
+      } else {
+        clone = document.importNode(n);
+      }
+
+      destination.appendChild(clone);
+    });
+  }
+
   function onSnapshot (snapshot) {
-    var child;
-
-    if (document.importNode) {
-      child = document.importNode(snapshot.firstChild);
-    } else {
-      child = snapshot.firstChild.cloneNode(true);
-    }
-
     root.innerHTML = '';
-    root.appendChild(child);
+
+    copyChildren(snapshot.firstChild, root);
   }
 
   function onPatch (patch) {
     Array.from(patch.childNodes).forEach((n) => {
       var uuid = n.getAttribute(UUID_KEY);
-      var target = root.querySelector(`[${UUID_KEY}='${uuid}']`);
+      var target = pa.query(UUID_KEY, uuid);
+
+      if (!target) {
+        throw new Error(`Unable to find target element with uuid '${uuid}' to patch`);
+      }
 
       // Apply attributes
       for (var i = 0; i < n.attributes.length; i++) {
@@ -43,8 +66,6 @@ function Apply (root) {
   }
 
   this.onMessage = function (message) {
-    console.log(message.outerHTML);
-
     if (message.nodeName.toLowerCase() === PATCH_NODE_NAME) {
       onPatch(message);
     } else if (message.nodeName.toLowerCase() === SNAPSHOT_NODE_NAME) {
