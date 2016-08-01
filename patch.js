@@ -1,4 +1,4 @@
-/* globals MutationObserver */
+/* globals HTMLElement, MutationObserver */
 
 /*
 
@@ -108,7 +108,7 @@ function Patch (root, broadcast, filter) {
 
       switch (mutation.type) {
         case 'attributes':
-          el.setAttribute(mutation.attributeName, mutation.target.getAttribute(mutation.attributeName));
+          el.setAttribute(mutation.attributeName, HTMLElement.prototype.getAttribute.call(mutation.target, mutation.attributeName));
           break;
 
         case 'childList':
