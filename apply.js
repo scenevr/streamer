@@ -25,7 +25,7 @@ function Apply (root) {
   function onPatch (patch) {
     Array.from(patch.childNodes).forEach((n) => {
       var uuid = n.getAttribute(UUID_KEY);
-      var target = root.querySelector(`[${UUID_KEY}=${uuid}]`);
+      var target = root.querySelector(`[${UUID_KEY}='${uuid}']`);
 
       // Apply attributes
       for (var i = 0; i < n.attributes.length; i++) {
