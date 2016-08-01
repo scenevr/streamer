@@ -4,8 +4,14 @@ var microdom = require('micro-dom');
 
 global.MutationObserver = require('micro-dom').MutationObserver;
 
-function createDocument () {
-  return new microdom.Document();
+function createDocument (html) {
+  var doc = new microdom.Document();
+
+  if (html) {
+    doc.documentElement.innerHTML = html;
+  }
+
+  return doc;
 }
 
 test('stream body tag', (t) => {
@@ -76,6 +82,18 @@ test('remove an element', (t) => {
     var scene = doc.querySelector('a-scene');
     scene.removeChild(scene.firstChild);
   }, 5);
+});
+
+test('add some text', (t) => {
+  var doc = createDocument('<body><a-scene><a-cube></a-cube></a-scene></body>');
+
+  Patch(doc.documentElement, (message) => {
+    t.ok(message.match(/i am a potato/));
+    t.end();
+  });
+
+  var scene = doc.querySelector('a-cube');
+  scene.innerHTML = 'hi mum i am a potato';
 });
 
 test('get full state', (t) => {

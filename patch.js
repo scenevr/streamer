@@ -27,7 +27,7 @@ function Patch (root, broadcast) {
   function treeUUID (el, childNodes) {
     var nodes = [el];
 
-    if (childNodes) {
+    if (childNodes && el.nodeType === 1) {
       nodes = nodes.concat(el.querySelectorAll('*'));
     }
 
@@ -39,17 +39,27 @@ function Patch (root, broadcast) {
   }
 
   function cloneWithUUID (el) {
-    var result = el.cloneNode(false);
+    var result;
 
-    result.setAttribute(UUID_KEY, pa.get(el, UUID_KEY));
+    if (el.nodeType === 1) {
+      result = el.cloneNode(false);
+    } else if (el.nodeType === 3) {
+      result = document.createTextNode(el.nodeValue);
+    } else {
+      throw new Error('Invalid node type to clone');
+    }
 
-    el.childNodes.forEach((n) => {
-      if (n.nodeType === 1) {
-        result.appendChild(cloneWithUUID(n));
-      } else {
-        result.appendChild(n.cloneNode(true));
-      }
-    });
+    if (el.nodeType === 1) {
+      result.setAttribute(UUID_KEY, pa.get(el, UUID_KEY));
+
+      el.childNodes.forEach((n) => {
+        if (n.nodeType === 1) {
+          result.appendChild(cloneWithUUID(n));
+        } else {
+          result.appendChild(n.cloneNode(true));
+        }
+      });
+    }
 
     return result;
   }
