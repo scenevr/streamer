@@ -114,6 +114,31 @@ test('get full state', (t) => {
   t.end();
 });
 
+test('filter script tags', (t) => {
+  var doc = createDocument();
+
+  var p = new Patch(doc.documentElement, (message) => {}, (el) => {
+    if (el.nodeName === 'SCRIPT') {
+      return false;
+    }
+
+    if (el.nodeName === 'LINK') {
+      return false;
+    }
+
+    return true;
+  });
+
+  doc.documentElement.innerHTML = '<body><a-scene></a-scene><script>hello()</script><link rel="http://blah/blah" /></body>';
+
+  var s = p.getSnapshot();
+  t.ok(s.match(/<a-scene/));
+  t.ok(!s.match(/<script/));
+  t.ok(!s.match(/<link/));
+
+  t.end();
+});
+
 test('animate a cube', (t) => {
   var doc = createDocument();
   var interval;

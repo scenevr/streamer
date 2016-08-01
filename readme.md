@@ -2,10 +2,6 @@
 
 One way dom sync over the wire.
 
-## Requirements
-
-All dom elements need a uuid attribute.
-
 ## Usage
 
 Sending:

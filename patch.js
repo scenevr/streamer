@@ -18,7 +18,7 @@ const DEAD_NODE_NAME = 'dead';
 const PATCH_NODE_NAME = 'patch';
 const SNAPSHOT_NODE_NAME = 'snapshot';
 
-function Patch (root, broadcast) {
+function Patch (root, broadcast, filter) {
   var document = root.ownerDocument;
 
   function generateUUID () {
@@ -48,6 +48,10 @@ function Patch (root, broadcast) {
     var result;
 
     if (el.nodeType === 1) {
+      if (filter && !filter(el)) {
+        return document.createTextNode('');
+      }
+
       result = el.cloneNode(false);
     } else if (el.nodeType === 3) {
       result = document.createTextNode(el.nodeValue);
@@ -118,7 +122,7 @@ function Patch (root, broadcast) {
             removed.setAttribute(UUID_KEY, pa.get(m, UUID_KEY));
             el.appendChild(removed);
           });
-        
+
           break;
 
         default:
