@@ -13,8 +13,10 @@ var pa = require('./private-attributes');
 var uuid = require('uuid');
 
 const UUID_KEY = 'data-uuid';
+const ROOT_UUID = '00000000-0000-0000-0000-000000000000';
 const DEAD_NODE_NAME = 'dead';
 const PATCH_NODE_NAME = 'patch';
+const SNAPSHOT_NODE_NAME = 'snapshot';
 
 function Patch (root, broadcast) {
   var document = root.ownerDocument;
@@ -33,7 +35,11 @@ function Patch (root, broadcast) {
 
     nodes.forEach((e) => {
       if (!pa.has(e, UUID_KEY)) {
+        // if (e === root) {
+        //   pa.set(e, UUID_KEY, ROOT_UUID);
+        // } else {
         pa.set(e, UUID_KEY, generateUUID());
+        // }
       }
     });
   }
@@ -64,8 +70,10 @@ function Patch (root, broadcast) {
     return result;
   }
 
-  this.getFullState = function () {
-    return cloneWithUUID(root).outerHTML;
+  this.getSnapshot = function () {
+    var snapshot = document.createElement(SNAPSHOT_NODE_NAME);
+    snapshot.appendChild(cloneWithUUID(root));
+    return snapshot.outerHTML;
   };
 
   treeUUID(root, true);

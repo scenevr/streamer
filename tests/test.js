@@ -1,5 +1,6 @@
 var test = require('tape');
 var Patch = require('../patch');
+var Apply = require('../apply');
 var microdom = require('micro-dom');
 
 global.MutationObserver = require('micro-dom').MutationObserver;
@@ -12,6 +13,12 @@ function createDocument (html) {
   }
 
   return doc;
+}
+
+function parseMessage (html) {
+  var doc = new microdom.Document();
+  doc.body.innerHTML = html;
+  return doc.body.firstChild;
 }
 
 test('stream body tag', (t) => {
@@ -102,7 +109,7 @@ test('get full state', (t) => {
   var p = new Patch(doc.documentElement, (message) => {});
   doc.documentElement.innerHTML = '<body><a-scene><a-cube></a-cube></a-scene></body>';
 
-  t.ok(p.getFullState().match(/^<html/));
+  t.ok(p.getSnapshot().match(/<html/));
 
   t.end();
 });
@@ -114,7 +121,7 @@ test('animate a cube', (t) => {
   doc.documentElement.innerHTML = '<body><a-scene><a-cube></a-cube></a-scene></body>';
 
   Patch(doc.documentElement, (message) => {
-    console.log(message);
+    // console.log(message);
     // t.equal(message.mutations.length, 1);
     // t.equal(message.mutations[0].type, 'attribute');
     // t.equal(message.mutations[0].name, 'rotation');
@@ -138,5 +145,32 @@ test('animate a cube', (t) => {
     clearInterval(interval);
     t.end();
   }, 25);
+});
+
+/* Apply */
+
+test('add some text', (t) => {
+  t.plan(4);
+
+  var doc = createDocument('<body><a-scene><a-cube></a-cube></a-scene></body>');
+  var slave = createDocument();
+  var apply = new Apply(slave.documentElement);
+
+  var patch = new Patch(doc.documentElement, (message) => {
+    var patch = parseMessage(message);
+    t.equal('PATCH', patch.nodeName);
+    t.ok(apply.onMessage(patch));
+  });
+
+  apply.onMessage(parseMessage(patch.getSnapshot()));
+
+  var cube = doc.querySelector('a-cube');
+  cube.setAttribute('position', '1 2 3');
+
+  setTimeout(() => {
+    var cube = slave.querySelector('a-cube');
+    t.ok(cube);
+    t.equal('1 2 3', cube.getAttribute('position'));
+  }, 100);
 });
 
