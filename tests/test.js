@@ -3,6 +3,7 @@ var Patch = require('../patch');
 var Apply = require('../apply');
 var microdom = require('micro-dom');
 
+global.HTMLElement = microdom.HTMLElement;
 global.MutationObserver = require('micro-dom').MutationObserver;
 
 function createDocument (html) {

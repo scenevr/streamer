@@ -1,8 +1,7 @@
 var pa = require('./private-attributes');
 
 const UUID_KEY = 'data-uuid';
-const ROOT_UUID = '00000000-0000-0000-0000-000000000000';
-const DEAD_NODE_NAME = 'dead';
+// const DEAD_NODE_NAME = 'dead';
 const PATCH_NODE_NAME = 'patch';
 const SNAPSHOT_NODE_NAME = 'snapshot';
 
