@@ -1,20 +1,28 @@
 # Scene Streamer
 
+[![Build Status](https://travis-ci.org/scenevr/streamer.svg?branch=master)](https://travis-ci.org/scenevr/streamer)
+[![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+
+
 Watch a dom for changes and stream changes to the dom via an xml-base protocol.
 
 ## Usage
 
-  npm install --save scene-streamer
+Install:
 
-  import { Patch, Apply } from 'scene-streamer'
+    npm install --save scene-streamer
 
-Sending:
+Then require:
+
+    import { Patch, Apply } from 'scene-streamer'
+
+Watch a DOM and generate patches:
 
     new Patch(domnode, (events) => {
       ws.send(events);
     });
 
-Recieving:
+Recieve patches and apply them to a local DOM:
 
     let apply = new Apply(domnode);
 
