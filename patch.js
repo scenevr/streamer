@@ -1,5 +1,3 @@
-/* globals HTMLElement, MutationObserver */
-
 /*
 
   Todo:
@@ -17,7 +15,7 @@ const DEAD_NODE_NAME = 'dead';
 const PATCH_NODE_NAME = 'patch';
 const SNAPSHOT_NODE_NAME = 'snapshot';
 
-function Patch (root, broadcast, filter) {
+function Patch (global, root, broadcast, filter) {
   var document = root.ownerDocument;
 
   function generateUUID () {
@@ -81,7 +79,7 @@ function Patch (root, broadcast, filter) {
 
   treeUUID(root, true);
 
-  var observer = new MutationObserver(function (mutations) {
+  var observer = new global.MutationObserver(function (mutations) {
     var patch = document.createElement(PATCH_NODE_NAME);
 
     // Cache attribute mutations to merge them
@@ -107,7 +105,7 @@ function Patch (root, broadcast, filter) {
 
       switch (mutation.type) {
         case 'attributes':
-          el.setAttribute(mutation.attributeName, HTMLElement.prototype.getAttribute.call(mutation.target, mutation.attributeName));
+          el.setAttribute(mutation.attributeName, global.HTMLElement.prototype.getAttribute.call(mutation.target, mutation.attributeName));
           break;
 
         case 'childList':

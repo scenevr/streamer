@@ -18,9 +18,13 @@ Then require:
 
 Watch a DOM and generate patches:
 
-    new Patch(domnode, (events) => {
+    new Patch(window, domnode, (events) => {
       ws.send(events);
     });
+
+You need to specify the global object that has an `MutationObserver` and `HTMLElement`
+defined on it. `window` will work on the browser. You can use `scenevr/microdom` for
+server side.
 
 Recieve patches and apply them to a local DOM:
 
