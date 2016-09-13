@@ -1,6 +1,6 @@
 # Scene Streamer
 
-[![Build Status](https://travis-ci.org/scenevr/streamer.svg?branch=master)](https://travis-ci.org/scenevr/streamer)
+[![Build Status](https://travis-ci.org/scenevr/streamer.svg?branch=master&)](https://travis-ci.org/scenevr/streamer)
 [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
 
 

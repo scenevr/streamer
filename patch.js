@@ -57,7 +57,14 @@ function Patch (global, root, broadcast, filter) {
     }
 
     if (el.nodeType === 1) {
-      result.setAttribute(UUID_KEY, pa.get(el, UUID_KEY));
+      var uuid = pa.get(el, UUID_KEY);
+
+      if (!uuid) {
+        treeUUID(el, el.childNodes);
+        uuid = pa.get(el, UUID_KEY);
+      }
+
+      result.setAttribute(UUID_KEY, uuid);
 
       el.childNodes.forEach((n) => {
         if (n.nodeType === 1) {

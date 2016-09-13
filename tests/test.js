@@ -3,8 +3,10 @@ var Patch = require('../patch');
 var Apply = require('../apply');
 var microdom = require('micro-dom');
 
-global.HTMLElement = microdom.HTMLElement;
-global.MutationObserver = require('micro-dom').MutationObserver;
+const GLOBALS = {
+  HTMLElement: microdom.HTMLElement,
+  MutationObserver: require('micro-dom').MutationObserver
+};
 
 function createDocument (html) {
   var doc = new microdom.Document();
@@ -25,7 +27,7 @@ function parseMessage (html) {
 test('stream body tag', (t) => {
   var doc = createDocument();
 
-  Patch(doc.documentElement, (message) => {
+  Patch(GLOBALS, doc.documentElement, (message) => {
     t.ok(message.match(/<patch/));
     t.ok(message.match(/<html data-uuid="\S+"/));
     t.ok(message.match(/<a-cube data-uuid/));
@@ -51,7 +53,7 @@ test('add some elements', (t) => {
     }
   ];
 
-  Patch(doc.documentElement, (message) => {
+  Patch(GLOBALS, doc.documentElement, (message) => {
     matchers.shift()(message);
   });
 
@@ -82,7 +84,7 @@ test('remove an element', (t) => {
 
   doc.documentElement.innerHTML = '<body><a-scene><a-cube></a-cube></a-scene></body>';
 
-  Patch(doc.documentElement, (message) => {
+  Patch(GLOBALS, doc.documentElement, (message) => {
     matchers.shift()(message);
   });
 
@@ -95,7 +97,7 @@ test('remove an element', (t) => {
 test('add some text', (t) => {
   var doc = createDocument('<body><a-scene><a-cube></a-cube></a-scene></body>');
 
-  Patch(doc.documentElement, (message) => {
+  Patch(GLOBALS, doc.documentElement, (message) => {
     t.ok(message.match(/i am a potato/));
     t.end();
   });
@@ -107,18 +109,17 @@ test('add some text', (t) => {
 test('get full state', (t) => {
   var doc = createDocument();
 
-  var p = new Patch(doc.documentElement, (message) => {});
+  var p = new Patch(GLOBALS, doc.documentElement, (message) => {});
   doc.documentElement.innerHTML = '<body><a-scene><a-cube></a-cube></a-scene></body>';
 
   t.ok(p.getSnapshot().match(/<html/));
-
   t.end();
 });
 
 test('filter script tags', (t) => {
   var doc = createDocument();
 
-  var p = new Patch(doc.documentElement, (message) => {}, (el) => {
+  var p = new Patch(GLOBALS, doc.documentElement, (message) => {}, (el) => {
     if (el.nodeName === 'SCRIPT') {
       return false;
     }
@@ -146,7 +147,7 @@ test('animate a cube', (t) => {
 
   doc.documentElement.innerHTML = '<body><a-scene><a-cube></a-cube></a-scene></body>';
 
-  Patch(doc.documentElement, (message) => {
+  Patch(GLOBALS, doc.documentElement, (message) => {
     // console.log(message);
     // t.equal(message.mutations.length, 1);
     // t.equal(message.mutations[0].type, 'attribute');
@@ -182,7 +183,7 @@ test('add some text', (t) => {
   var slave = createDocument();
   var apply = new Apply(slave.documentElement);
 
-  var patch = new Patch(doc.documentElement, (message) => {
+  var patch = new Patch(GLOBALS, doc.documentElement, (message) => {
     var patch = parseMessage(message);
     t.equal('PATCH', patch.nodeName);
     t.ok(apply.onMessage(patch));
