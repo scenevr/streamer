@@ -63,7 +63,9 @@ function Apply (root) {
           target.appendChild(child);
           child.outerHTML = n.outerHTML;
         } else {
-          console.error('Invalid state or reused uuid');
+          // Ignore duplicate element - this is cause when the snapshot
+          // and diff are sent at the same time, it's sort of a shitty
+          // situation but I'm not sure how to fix it nicely.
         }
       });
     });
