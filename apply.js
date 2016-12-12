@@ -1,7 +1,5 @@
-var pa = require('./private-attributes');
-
 const UUID_KEY = 'data-uuid';
-// const DEAD_NODE_NAME = 'dead';
+const DEAD_NODE_NAME = 'dead';
 const PATCH_NODE_NAME = 'patch';
 const SNAPSHOT_NODE_NAME = 'snapshot';
 
@@ -19,12 +17,7 @@ function Apply (root) {
         // Apply attributes
         for (var i = 0; i < n.attributes.length; i++) {
           var attribute = n.attributes[i];
-
-          if (attribute.name === UUID_KEY) {
-            pa.set(clone, UUID_KEY, attribute.value);
-          } else {
-            clone.setAttribute(attribute.name, attribute.value);
-          }
+          clone.setAttribute(attribute.name, attribute.value);
         }
       } else {
         clone = document.importNode(n);
@@ -40,27 +33,39 @@ function Apply (root) {
     copyChildren(snapshot.firstChild, root);
   }
 
+  function applyAttributes (target, source) {
+    for (var i = 0; i < source.attributes.length; i++) {
+      var attribute = source.attributes[i];
+
+      target.setAttribute(attribute.name, attribute.value);
+    }
+  }
+
   function onPatch (patch) {
     Array.from(patch.childNodes).forEach((n) => {
       var uuid = n.getAttribute(UUID_KEY);
-      var target = pa.query(UUID_KEY, uuid);
+      var target = document.querySelector(`[${UUID_KEY}='${uuid}']`);
 
       if (!target) {
         throw new Error(`Unable to find target element with uuid '${uuid}' to patch`);
       }
 
-      // Apply attributes
-      for (var i = 0; i < n.attributes.length; i++) {
-        var attribute = n.attributes[i];
+      applyAttributes(target, n);
 
-        if (attribute.name === UUID_KEY) {
-          continue;
+      Array.from(n.childNodes).forEach((n) => {
+        var uuid = n.getAttribute(UUID_KEY);
+        var child = document.querySelector(`[${UUID_KEY}='${uuid}']`);
+
+        if (child && n.nodeName.toLowerCase() === DEAD_NODE_NAME) {
+          target.removeChild(child);
+        } else if (!child) {
+          child = document.createElement(n.nodeName);
+          target.appendChild(child);
+          child.outerHTML = n.outerHTML;
+        } else {
+          console.error('Invalid state or reused uuid');
         }
-
-        target.setAttribute(attribute.name, attribute.value);
-      }
-
-      // Todo apply child changes
+      });
     });
   }
 
