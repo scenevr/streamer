@@ -44,7 +44,7 @@ function Apply (root) {
   function onPatch (patch) {
     Array.from(patch.childNodes).forEach((n) => {
       var uuid = n.getAttribute(UUID_KEY);
-      var target = document.querySelector(`[${UUID_KEY}='${uuid}']`);
+      var target = root.querySelector(`[${UUID_KEY}='${uuid}']`);
 
       if (!target) {
         throw new Error(`Unable to find target element with uuid '${uuid}' to patch`);
@@ -54,7 +54,7 @@ function Apply (root) {
 
       Array.from(n.childNodes).forEach((n) => {
         var uuid = n.getAttribute(UUID_KEY);
-        var child = document.querySelector(`[${UUID_KEY}='${uuid}']`);
+        var child = root.querySelector(`[${UUID_KEY}='${uuid}']`);
 
         if (child && n.nodeName.toLowerCase() === DEAD_NODE_NAME) {
           target.removeChild(child);
