@@ -37,7 +37,10 @@ function Apply (root) {
     for (var i = 0; i < source.attributes.length; i++) {
       var attribute = source.attributes[i];
 
-      target.setAttribute(attribute.name, attribute.value);
+      // Don't trigger mutation events unnecessarily
+      if (target.getAttribute(attribute.name) !== attribute.value) {
+        target.setAttribute(attribute.name, attribute.value);
+      }
     }
   }
 
