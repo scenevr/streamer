@@ -58,4 +58,6 @@ Use the supplied `apply` function to apply changes to the dom. The wire protocol
 may change as I find more efficient ways of diffing and patching, but the exposed
 API should stay the same.
 
-The 
+## Notes
+
+Sorry I used es6 in this so it requires babelify. It's not really necessary but oh well.
