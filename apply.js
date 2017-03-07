@@ -31,6 +31,14 @@ function Apply (root) {
     root.innerHTML = '';
 
     copyChildren(snapshot.firstChild, root);
+
+    var n = snapshot.firstChild;
+
+    // Apply attributes
+    for (var i = 0; i < n.attributes.length; i++) {
+      var attribute = n.attributes[i];
+      root.setAttribute(attribute.name, attribute.value);
+    }
   }
 
   function applyAttributes (target, source) {
@@ -48,6 +56,10 @@ function Apply (root) {
     Array.from(patch.childNodes).forEach((n) => {
       var uuid = n.getAttribute(UUID_KEY);
       var target = root.querySelector(`[${UUID_KEY}='${uuid}']`);
+
+      if (!target && root.getAttribute(UUID_KEY) === uuid) {
+        target = root;
+      }
 
       if (!target) {
         throw new Error(`Unable to find target element with uuid '${uuid}' to patch`);
